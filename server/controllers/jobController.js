@@ -1,6 +1,6 @@
 import Job from "../models/Job.js"
 
-// Add Job (This function is likely not used, but included for completeness)
+// Add Job (Aliased from companyController.js in the jobRoutes)
 export const addJob = async (req, res) => {
     
     // 1. Get the verified companyId from the middleware

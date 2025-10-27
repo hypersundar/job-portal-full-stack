@@ -23,7 +23,7 @@ const ApplyJob = () => {
   const [JobData, setJobData] = useState(null)
   const [isAlreadyApplied, setIsAlreadyApplied] = useState(false)
 
-  const { jobs, backendUrl, userData, userApplications, fetchUserApplications } = useContext(AppContext)
+  const { jobs, backendUrl, userData, userApplications, fetchUserApplications, fetchUserData } = useContext(AppContext)
 
   const fetchJob = async () => {
 
@@ -46,17 +46,32 @@ const ApplyJob = () => {
   const applyHandler = async () => {
     try {
 
-      if (!userData) {
+      const token = await getToken();
+
+      // Check 1: Authentication Gate (Clerk Token)
+      if (!token) {
         return toast.error('Login to apply for jobs')
       }
 
+      // Check 2: Application Data Load (userData state)
+      if (!userData) {
+        // User is authenticated (token exists), but app data hasn't loaded (timing issue).
+        
+        // Force a re-fetch of user data to ensure the state update is running
+        fetchUserData(); 
+        
+        // Prompt the user to wait and click again.
+        return toast.info('Loading user profile data. Please wait a moment and click "Apply Now" again.')
+      }
+
+
+      // Check 3: Resume Requirement (only runs if userData is NOT null)
       if (!userData.resume) {
         navigate('/applications')
         return toast.error('Upload resume to apply')
       }
 
-      const token = await getToken()
-
+      // Proceed with the application API call
       const { data } = await axios.post(backendUrl + '/api/users/apply',
         { jobId: JobData._id },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -82,7 +97,10 @@ const ApplyJob = () => {
   }
 
   useEffect(() => {
-    fetchJob()
+    // ⚠️ FIX: Only call fetchJob if 'id' is present and not the string "undefined"
+    if (id && id !== 'undefined') {
+        fetchJob()
+    }
   }, [id])
 
   useEffect(() => {
