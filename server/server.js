@@ -6,7 +6,6 @@ import companyRoutes from './routes/companyRoutes.js'
 import jobRoutes from './routes/jobRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 import { clerkWebhooks } from './controllers/webhooks.js'
-// If you are using the Clerk middleware globally, import it here:
 // import { clerkMiddleware } from '@clerk/express' 
 
 

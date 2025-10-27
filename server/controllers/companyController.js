@@ -7,7 +7,7 @@ import JobApplication from "../models/JobApplication.js";
 
 // Register a new company
 export const registerCompany = async (req, res) => {
-    // ... (content remains the same) ...
+    // ... (rest of registerCompany) ...
     const { name, email, password } = req.body
 
     const imageFile = req.file;
@@ -54,7 +54,7 @@ export const registerCompany = async (req, res) => {
 
 // Login Company
 export const loginCompany = async (req, res) => {
-    // ... (content remains the same) ...
+    // ... (rest of loginCompany) ...
     const { email, password } = req.body
 
     try {
@@ -86,7 +86,7 @@ export const loginCompany = async (req, res) => {
 
 // Get Company Data
 export const getCompanyData = async (req, res) => {
-    // ... (content remains the same) ...
+    // ... (rest of getCompanyData) ...
     try {
 
         const company = req.company
