@@ -6,6 +6,9 @@ import companyRoutes from './routes/companyRoutes.js'
 import jobRoutes from './routes/jobRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 import { clerkWebhooks } from './controllers/webhooks.js'
+// We will use the new middleware file for protection
+// import { clerkMiddleware } from '@clerk/express' 
+
 
 // App Config
 const app = express()
@@ -15,15 +18,15 @@ const port = process.env.PORT || 5000
 connectDB()
 
 // ----------------------------------------------------------------
-// FIX 1: CORS Middleware (Must run first for cross-origin requests)
+// FIX 1: CORS Middleware (MUST run first)
 // ----------------------------------------------------------------
 app.use(cors()) 
 
 // ----------------------------------------------------------------
-// FIX 2: WEBHOOK BODY PARSING CONFLICT 
+// FIX 2: WEBHOOK ROUTE - Must capture raw body and run before express.json()
+// We save the raw body to req.rawBody for Svix verification in the controller.
+app.post('/api/webhooks', express.raw({ type: 'application/json', verify: (req, res, buf) => { req.rawBody = buf; } }), clerkWebhooks)
 // ----------------------------------------------------------------
-// Webhook Route MUST be defined before the global express.json()
-app.post('/api/webhooks', express.raw({ type: 'application/json' }), clerkWebhooks)
 
 // Middleware (for all other routes)
 app.use(express.json()) 
