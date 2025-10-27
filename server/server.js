@@ -17,21 +17,20 @@ const port = process.env.PORT || 5000
 connectDB()
 
 // ----------------------------------------------------------------
-// ⚠️ FIX: WEBHOOK BODY PARSING CONFLICT
+// ⚠️ FIX 1: CORS Middleware (Moved to the top to ensure headers are sent)
 // ----------------------------------------------------------------
+// By default, cors() allows all origins ('*'). This must run before any other middleware.
+app.use(cors()) 
 
-// 1. Webhook Route MUST be defined BEFORE the global express.json() middleware.
-// 2. Use a specific parser (req => raw) for the webhook route only.
+// ----------------------------------------------------------------
+// FIX 2: WEBHOOK BODY PARSING CONFLICT (Previous fix, keep this order)
+// ----------------------------------------------------------------
+// This specific route must use the raw body parser.
 app.post('/api/webhooks', express.raw({ type: 'application/json' }), clerkWebhooks)
 
-// ----------------------------------------------------------------
-// END FIX
-// ----------------------------------------------------------------
-
-
 // Middleware (for all other routes)
-app.use(express.json()) // <--- This now only applies to routes defined below this line
-app.use(cors())
+// This must stay after the webhook fix.
+app.use(express.json()) 
 
 // Routes
 app.use('/api/company', companyRoutes)
