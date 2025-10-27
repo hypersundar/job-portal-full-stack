@@ -105,8 +105,8 @@ export const getCompanyData = async (req, res) => {
 // Post New Job
 export const postJob = async (req, res) => {
 
-    // ⚠️ FIX: Safely exclude the rogue _id field from the request body
-    // This is the critical fix for the Cast to ObjectId error
+    // ⚠️ CRITICAL FIX: Safely exclude the rogue _id field from the request body.
+    // If _id exists in the body, Mongoose crashes. This prevents it.
     const { _id: rogueId, ...jobData } = req.body; 
 
     // Explicitly pull fields from the sanitized jobData
