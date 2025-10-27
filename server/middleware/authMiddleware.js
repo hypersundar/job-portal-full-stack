@@ -9,6 +9,8 @@ export const protectCompany = async (req,res,next) => {
 
     
     if (!token) {
+        // Log the failure to Vercel
+        console.error('PROTECT COMPANY FAIL: No token provided in headers.'); 
         return res.json({ success:false, message:'Not authorized, Login Again'})
     }
 
@@ -16,11 +18,22 @@ export const protectCompany = async (req,res,next) => {
         
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-        req.company = await Company.findById(decoded.id).select('-password')
-
+        // Find the company and save it to the request object
+        const company = await Company.findById(decoded.id).select('-password')
+        
+        // ⚠️ CRITICAL CHECK: If company is null (ID was valid but company was deleted/not found)
+        if (!company) {
+             console.error(`PROTECT COMPANY FAIL: Company ID ${decoded.id} not found in database.`); 
+             return res.json({ success:false, message:'Company not found or deleted.'});
+        }
+        
+        req.company = company
+        
         next()
 
     } catch (error) {
+        // Log the token verification failure
+        console.error('PROTECT COMPANY FAIL: JWT Verification failed.', error.message);
         res.json({success:false, message: error.message})
     }
 
