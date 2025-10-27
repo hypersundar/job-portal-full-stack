@@ -1,13 +1,13 @@
 import express from 'express'
 import { applyForJob, getUserData, getUserJobApplications, updateUserResume } from '../controllers/userController.js'
 import upload from '../config/multer.js'
-// NOTE: Assuming the new middleware file is here
+// ⚠️ Import the new middleware
 import { protectUser } from '../middleware/clerkAuthMiddleware.js' 
 
 
 const router = express.Router()
 
-// All these user routes now use protectUser middleware
+// Apply protectUser middleware to all user-specific routes
 // Get user Data
 router.get('/user', protectUser, getUserData)
 

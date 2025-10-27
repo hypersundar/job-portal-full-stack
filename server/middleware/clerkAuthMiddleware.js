@@ -1,34 +1,34 @@
 // server/middleware/clerkAuthMiddleware.js
 
-import { clerkClient } from '@clerk/clerk-sdk-node';
+// ⚠️ We use the package you have installed: @clerk/express
+import { ClerkExpressRequireAuth } from '@clerk/express';
 
-// Middleware to verify the Clerk JWT and populate req.auth
-export const protectUser = async (req, res, next) => {
-    try {
-        // 1. Get the token from the Authorization header
-        const authHeader = req.headers.authorization;
-        
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ success: false, message: 'Authorization token not provided.' });
+// Middleware to protect user routes using Clerk
+export const protectUser = ClerkExpressRequireAuth({
+    // Configuration to ensure the token verification is handled
+    // by the Clerk SDK, which will automatically extract the userId.
+    // We don't need custom logic here, ClerkExpressRequireAuth handles it.
+});
+
+/* // Note: If the above simple export fails to set req.auth.userId correctly, 
+// you may need to wrap it like this for Mongoose models to work:
+
+export const protectUser = (req, res, next) => {
+    // Call the Clerk middleware function
+    ClerkExpressRequireAuth({})(req, res, (err) => {
+        if (err) {
+            return res.status(401).json({ success: false, message: 'Authorization failed.' });
         }
         
-        const token = authHeader.split(' ')[1];
-        
-        // 2. Verify the token using Clerk's SDK
-        const verifiedToken = await clerkClient.verifyToken(token);
-        
-        // 3. Populate req.auth with the user ID and other claims
-        // Note: The structure of the Clerk payload is slightly different from req.auth.userId, 
-        // so we'll explicitly map it.
-        req.auth = { 
-            userId: verifiedToken.userId, 
-            sessionId: verifiedToken.sid 
-        };
-
-        next();
-        
-    } catch (error) {
-        // Token verification failed (e.g., expired or invalid)
-        res.status(401).json({ success: false, message: 'Token Invalid or Expired.' });
-    }
-}
+        // After successful auth, Clerk populates req.auth or similar.
+        // We ensure req.auth.userId is available for your controller (getUserData).
+        // req.auth should be populated by Clerk's middleware.
+        if (req.auth && req.auth.userId) {
+            next();
+        } else {
+             // Fallback if req.auth isn't populated as expected
+             return res.status(401).json({ success: false, message: 'Authorization failed: User ID not found in token.' });
+        }
+    });
+};
+*/

@@ -1,5 +1,3 @@
-// server/server.js
-
 import express from 'express'
 import cors from 'cors'
 import 'dotenv/config'
@@ -17,19 +15,17 @@ const port = process.env.PORT || 5000
 connectDB()
 
 // ----------------------------------------------------------------
-// ⚠️ FIX 1: CORS Middleware (Moved to the top to ensure headers are sent)
+// FIX 1: CORS Middleware (Must run first for cross-origin requests)
 // ----------------------------------------------------------------
-// By default, cors() allows all origins ('*'). This must run before any other middleware.
 app.use(cors()) 
 
 // ----------------------------------------------------------------
-// FIX 2: WEBHOOK BODY PARSING CONFLICT (Previous fix, keep this order)
+// FIX 2: WEBHOOK BODY PARSING CONFLICT 
 // ----------------------------------------------------------------
-// This specific route must use the raw body parser.
+// Webhook Route MUST be defined before the global express.json()
 app.post('/api/webhooks', express.raw({ type: 'application/json' }), clerkWebhooks)
 
 // Middleware (for all other routes)
-// This must stay after the webhook fix.
 app.use(express.json()) 
 
 // Routes
