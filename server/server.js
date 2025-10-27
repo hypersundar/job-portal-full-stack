@@ -1,44 +1,48 @@
-import './config/instrument.js'
+// server/server.js
+
 import express from 'express'
 import cors from 'cors'
 import 'dotenv/config'
 import connectDB from './config/db.js'
-import * as Sentry from "@sentry/node";
-import { clerkWebhooks } from './controllers/webhooks.js'
 import companyRoutes from './routes/companyRoutes.js'
-import connectCloudinary from './config/cloudinary.js'
 import jobRoutes from './routes/jobRoutes.js'
 import userRoutes from './routes/userRoutes.js'
-import { clerkMiddleware } from '@clerk/express'
+import { clerkWebhooks } from './controllers/webhooks.js'
 
-
-// Initialize Express
+// App Config
 const app = express()
+const port = process.env.PORT || 5000
 
-// Connect to database
+// DB Connection
 connectDB()
-await connectCloudinary()
 
-// Middlewares
+// ----------------------------------------------------------------
+// ⚠️ FIX: WEBHOOK BODY PARSING CONFLICT
+// ----------------------------------------------------------------
+
+// 1. Webhook Route MUST be defined BEFORE the global express.json() middleware.
+// 2. Use a specific parser (req => raw) for the webhook route only.
+app.post('/api/webhooks', express.raw({ type: 'application/json' }), clerkWebhooks)
+
+// ----------------------------------------------------------------
+// END FIX
+// ----------------------------------------------------------------
+
+
+// Middleware (for all other routes)
+app.use(express.json()) // <--- This now only applies to routes defined below this line
 app.use(cors())
-app.use(express.json())
-app.use(clerkMiddleware())
 
 // Routes
-app.get('/', (req, res) => res.send("API Working"))
-app.get("/debug-sentry", function mainHandler(req, res) {
-  throw new Error("My first Sentry error!");
-});
-app.post('/webhooks', clerkWebhooks)
 app.use('/api/company', companyRoutes)
 app.use('/api/jobs', jobRoutes)
 app.use('/api/users', userRoutes)
 
-// Port
-const PORT = process.env.PORT || 5000
-
-Sentry.setupExpressErrorHandler(app);
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// Default Route
+app.get('/', (req, res) => {
+    res.send('API Working')
 })
+
+
+// Start Server
+app.listen(port, () => console.log(`Server is running on port ${port}`))
