@@ -4,5 +4,4 @@
 import { requireAuth } from '@clerk/express'; 
 
 // Middleware to protect user routes using Clerk.
-// requireAuth verifies the JWT and populates req.auth.
 export const protectUser = requireAuth({});
