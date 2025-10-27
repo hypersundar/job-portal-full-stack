@@ -1,6 +1,6 @@
 import Job from "../models/Job.js"
 
-// Add Job (Included here for completeness/aliasing)
+// Add Job (Aliased from companyController.js in the jobRoutes)
 export const addJob = async (req, res) => {
     
     // 1. Get the verified companyId from the middleware
@@ -68,7 +68,7 @@ export const getJobById = async (req, res) => {
 
         const { id } = req.params
 
-        // ⚠️ FIX: Check if the ID is valid BEFORE passing it to Mongoose
+        // ⚠️ CRITICAL FIX: Check if the ID is valid BEFORE passing it to Mongoose
         if (!id || id === 'undefined' || id.length < 10) { 
              console.log(`GET JOB BY ID FAILED: Invalid or missing ID: ${id}`);
              return res.json({ success: false, message: 'Invalid Job ID provided.' });

@@ -7,7 +7,7 @@ const router = express.Router()
 // Route to get all jobs data
 router.get('/', getJobs)
 
-// Route to add a new job (Protected by JWT and runs before getJobById)
+// Route to add a new job (Protected by JWT)
 router.post('/add-job', protectCompany, addJob)
 
 // Route to get a single job by ID
