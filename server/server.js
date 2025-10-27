@@ -24,13 +24,12 @@ app.use(cors())
 
 // ----------------------------------------------------------------
 // FIX 2: WEBHOOK ROUTE - Must capture raw body and run before express.json()
-// We save the raw body to req.rawBody for Svix verification.
+// This fixes Clerk webhook signature verification.
 app.post('/api/webhooks', express.raw({ type: 'application/json', verify: (req, res, buf) => { req.rawBody = buf; } }), clerkWebhooks)
 // ----------------------------------------------------------------
 
 // Middleware (for all other routes)
 app.use(express.json()) // Global JSON parsing
-// If you use Clerk middleware globally for all routes, place it here:
 // app.use(clerkMiddleware()) 
 
 

@@ -7,7 +7,7 @@ import JobApplication from "../models/JobApplication.js";
 
 // Register a new company
 export const registerCompany = async (req, res) => {
-
+    // ... (content remains the same) ...
     const { name, email, password } = req.body
 
     const imageFile = req.file;
@@ -54,7 +54,7 @@ export const registerCompany = async (req, res) => {
 
 // Login Company
 export const loginCompany = async (req, res) => {
-
+    // ... (content remains the same) ...
     const { email, password } = req.body
 
     try {
@@ -82,12 +82,11 @@ export const loginCompany = async (req, res) => {
     } catch (error) {
         res.json({ success: false, message: error.message })
     }
-
 }
 
 // Get Company Data
 export const getCompanyData = async (req, res) => {
-
+    // ... (content remains the same) ...
     try {
 
         const company = req.company
@@ -99,7 +98,6 @@ export const getCompanyData = async (req, res) => {
             success: false, message: error.message
         })
     }
-
 }
 
 // Post New Job
@@ -141,6 +139,7 @@ export const postJob = async (req, res) => {
 
 // Get Company Job Applicants
 export const getCompanyJobApplicants = async (req, res) => {
+    // ... (rest of getCompanyJobApplicants) ...
     try {
 
         const companyId = req.company._id
@@ -160,6 +159,7 @@ export const getCompanyJobApplicants = async (req, res) => {
 
 // Get Company Posted Jobs
 export const getCompanyPostedJobs = async (req, res) => {
+    // ... (rest of getCompanyPostedJobs) ...
     try {
 
         const companyId = req.company._id
@@ -181,7 +181,7 @@ export const getCompanyPostedJobs = async (req, res) => {
 
 // Change Job Application Status
 export const ChangeJobApplicationsStatus = async (req, res) => {
-
+    // ... (rest of ChangeJobApplicationsStatus) ...
     try {
 
         const { id, status } = req.body
@@ -200,6 +200,7 @@ export const ChangeJobApplicationsStatus = async (req, res) => {
 
 // Change Job Visiblity
 export const changeVisiblity = async (req, res) => {
+    // ... (rest of changeVisiblity) ...
     try {
 
         const { id } = req.body
