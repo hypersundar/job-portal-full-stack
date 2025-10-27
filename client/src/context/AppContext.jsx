@@ -63,8 +63,8 @@ export const AppContextProvider = (props) => {
         }
     }
 
-    // Function to Fetch User Data
-    const fetchUserData = async () => {
+ // Function to Fetch User Data
+    const fetchUserData = async (retries = 3) => {
         try {
 
             const token = await getToken();
@@ -74,9 +74,18 @@ export const AppContextProvider = (props) => {
 
             if (data.success) {
                 setUserData(data.user)
-            } else (
+            } else {
+                // Logic to handle "User Not Found" error and retry
+                if (data.message === 'User Not Found' && retries > 0) {
+                    // Wait for 1 second before retrying
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    console.log(`User not found, retrying... attempts left: ${retries - 1}`);
+                    return fetchUserData(retries - 1); // Recurse with one less retry
+                }
+                
+                // If it's a different error or no retries left, show the toast
                 toast.error(data.message)
-            )
+            }
 
         } catch (error) {
             toast.error(error.message)
