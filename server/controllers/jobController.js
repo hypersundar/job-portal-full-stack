@@ -1,12 +1,28 @@
 import Job from "../models/Job.js"
 
-// Add Job
+// Add Job (This function is likely not used, but included for completeness)
 export const addJob = async (req, res) => {
     
-    // ⚠️ FIX: Get the company ID from the token established by the protectCompany middleware
-    const companyId = req.company._id; 
+    // 1. Get the verified companyId from the middleware
+    const companyId = req.company?._id; 
+    
+    if (!companyId) {
+         console.error("ADD JOB FAIL: Authorization failed. Company ID missing from token.");
+         return res.status(401).json({ success: false, message: 'Authorization failed. Company ID missing.' });
+    }
 
-    const { title, description, category, location, level, salary } = req.body;
+    // 2. Safely exclude the rogue _id field from the request body
+    const { _id: rogueId, ...jobData } = req.body; 
+
+    // Explicitly pull only the valid body fields
+    const { 
+        title, 
+        description, 
+        category, 
+        location, 
+        level, 
+        salary 
+    } = jobData;
 
     // Basic validation
     if (!title || !description || !category || !location || !level || !salary) {
@@ -15,7 +31,7 @@ export const addJob = async (req, res) => {
 
     try {
         const job = await Job.create({
-            companyId, // This is the verified ObjectId Mongoose expects
+            companyId: companyId, // Verified ID
             title,
             description,
             category,
@@ -24,9 +40,9 @@ export const addJob = async (req, res) => {
             salary,
             date: Date.now()
         })
-        res.json({ success: true, message: 'Job added successfully' })
+        res.json({ success: true, message: 'Job added successfully', job: job })
     } catch (error) {
-        // If the Cast to ObjectId error was happening here, this ensures the correct ID is used.
+        console.error("JOB CREATION FAILED:", error.message);
         res.json({ success: false, message: error.message })
     }
 }
@@ -52,6 +68,13 @@ export const getJobById = async (req, res) => {
 
         const { id } = req.params
 
+        // ⚠️ FIX: Check if the ID is valid BEFORE passing it to Mongoose
+        if (!id || id === 'undefined' || id.length < 10) { 
+             console.log(`GET JOB BY ID FAILED: Invalid or missing ID: ${id}`);
+             return res.json({ success: false, message: 'Invalid Job ID provided.' });
+        }
+
+
         const job = await Job.findById(id)
             .populate({
                 path: 'companyId',
@@ -71,6 +94,8 @@ export const getJobById = async (req, res) => {
         })
 
     } catch (error) {
+        // Log the error but return a clean JSON response
+        console.error("GET JOB BY ID CRASH:", error.message);
         res.json({ success: false, message: error.message })
     }
 }
