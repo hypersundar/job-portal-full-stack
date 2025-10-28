@@ -1,4 +1,5 @@
 import Job from "../models/Job.js"
+import mongoose from "mongoose"
 
 // Add Job (Aliased from companyController.js in the jobRoutes)
 export const addJob = async (req, res) => {
@@ -65,15 +66,13 @@ export const getJobs = async (req, res) => {
 // Get Single Job Using JobID
 export const getJobById = async (req, res) => {
     try {
-
         const { id } = req.params
 
-        // ⚠️ CRITICAL FIX: Check if the ID is valid BEFORE passing it to Mongoose
-        if (!id || id === 'undefined' || id.length < 10) { 
-             console.log(`GET JOB BY ID FAILED: Invalid or missing ID: ${id}`);
-             return res.json({ success: false, message: 'Invalid Job ID provided.' });
+        // Use Mongoose's isValidObjectId for robust validation
+        if (!id || !mongoose.isValidObjectId(id)) {
+            console.log(`GET JOB BY ID FAILED: Invalid or missing ID: ${id}`);
+            return res.json({ success: false, message: 'Invalid Job ID provided.' });
         }
-
 
         const job = await Job.findById(id)
             .populate({
