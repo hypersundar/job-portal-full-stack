@@ -103,39 +103,36 @@ export const getCompanyData = async (req, res) => {
 // Post New Job
 export const postJob = async (req, res) => {
 
-    // ⚠️ FIX: Safely exclude the rogue _id field from the request body
-    // This is the critical fix for the Cast to ObjectId error
-    const { _id: rogueId, ...jobData } = req.body; 
-
-    // Explicitly pull fields from the sanitized jobData
-    const { title, description, location, salary, level, category } = jobData; 
+    const { title, description, location, salary, level, category } = req.body
 
     const companyId = req.company._id
 
     try {
-        
-        // Use Job.create for a cleaner operation
-        const newJob = await Job.create({
+        // Ensure companyId is a valid ObjectId
+        // If companyId is already an ObjectId, this is safe
+        // If it's a string, convert it
+        const jobData = {
             title,
             description,
             location,
             salary,
-            companyId, // Verified ID from token
+            companyId: companyId, // mongoose will handle string/ObjectId conversion
             date: Date.now(),
             level,
             category
-        })
+        }
+
+        const newJob = new Job(jobData)
+
+        await newJob.save()
 
         res.json({ success: true, newJob })
 
     } catch (error) {
-
-        console.error("POST JOB Mongoose Error:", error.message);
+        // Log error for debugging
+        console.error("Error creating job:", error.message)
         res.json({ success: false, message: error.message })
-
     }
-
-
 }
 
 // Get Company Job Applicants
