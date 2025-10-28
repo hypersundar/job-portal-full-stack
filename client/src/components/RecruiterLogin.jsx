@@ -27,6 +27,10 @@ const RecruiterLogin = () => {
             return setIsTextDataSubmited(true)
         }
 
+        if (state === "Sign Up" && isTextDataSubmited && !image) {
+            return toast.error("Please upload a company logo")
+        }
+
         try {
 
             if (state === "Login") {
