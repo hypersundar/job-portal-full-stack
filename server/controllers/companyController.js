@@ -103,7 +103,8 @@ export const getCompanyData = async (req, res) => {
 // Post New Job
 export const postJob = async (req, res) => {
 
-    // ⚠️ CRITICAL FIX: Safely exclude the rogue _id field from the request body.
+    // ⚠️ FIX: Safely exclude the rogue _id field from the request body
+    // This is the critical fix for the Cast to ObjectId error
     const { _id: rogueId, ...jobData } = req.body; 
 
     // Explicitly pull fields from the sanitized jobData
